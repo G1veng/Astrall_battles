@@ -7,10 +7,20 @@ class Settings():
 		self.bg_color = (230, 230, 230)
 
 		self.is_description_active = False
-		self.count_of_cards_in_hand = 5
+		self.count_of_cards_in_hand = 6
 		self.part_of_the_game = PartsOfGame.CHOOSE_CARDS_P1
 		self.turn = Players.PLAYER_ONE
 		self.start_gaming_points = 4
+		self.elements_count = 13
+
+		self.picture_weight = 110
+		self.picture_height = 110
+
+		self.text_length = 35
+		self.mana_increase_player_one = 1
+		self.mana_increase_player_two = 1
+		self.mana_increase_player_one_test = {"Air":1, "Fire":1, "Earth":1}
+		self.mana_increase_player_two_test = {"Air":1, "Fire":1, "Earth":1}
 
 
 class PartsOfGame(enum.Enum):
@@ -29,21 +39,34 @@ class Players(enum.Enum):
 
 
 class Elements():
-	def __init__(self, element):
-		if element == 1:
+	def get_element(self, id):
+		if id == 1:
 			return "Fire"
-		if element == 2:
+		if id == 2:
 			return "Water"
-		if element == 3:
+		if id == 3:
 			return "Air"
-		if element == 4:
+		if id == 4:
 			return "Earth"
-		if element == 5:
+		if id == 5:
 			return "Beast"
-		if element == 6:
+		if id == 6:
 			return "Chaos"
-		if element == 7:
+		if id == 7:
 			return "Control"
-		if element == 8:
+		if id == 8:
 			return "Death"
+		if id == 9:
+			return "Demonic"
+		if id == 10:
+			return "Holy"
+		if id == 11:
+			return "Illusion"
+		if id == 12:
+			return "Mechanical"
+		if id == 13:
+			return "Sorcery"
+
+	def get_elements_count(self):
+		return 13
 		

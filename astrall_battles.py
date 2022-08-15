@@ -9,25 +9,31 @@ import db_data
 import draw_text
 import empty_square
 import button
+import elements
 
 class AstralBattles():
     def __init__(self):
         pygame.init()
         self.settings = Set.Settings()
+        self.all_elements = Set.Elements()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
-        #region P1_CHOOSE_DECK
+        #region P_CHOOSE_DECK
         pygame.display.set_caption("Astrall Battles")
-        self.end_index_available_card = 5
-        self.start_index_available_card = 1
-        self.available_cards = CreateDeck(self.screen, self.start_index_available_card, self.end_index_available_card, 250, 100)
-        #self.description = draw_text.DrawText(self.screen, self.card, db_data.get_description(self.card.inner_name))
+        self.end_index_available_card = self.settings.count_of_cards_in_hand - 1
+        self.start_index_available_card = 0
+        self.current_element = "Fire"
+        self.available_cards = CreateDeck(self.screen, self.start_index_available_card, self.end_index_available_card, 250, 250, self.current_element)
+        self.description = None
+        self.info = None
+        self.viewing_card = None
         self.users_deck = empty_square.EmptySquare(250, 600, self.settings.count_of_cards_in_hand, self.screen)
-        self.available_cards_empty_squares = empty_square.EmptySquare(250, 100, self.settings.count_of_cards_in_hand, self.screen)
+        self.available_cards_empty_squares = empty_square.EmptySquare(250, 250, self.settings.count_of_cards_in_hand, self.screen)
         self.chosen_cards = []
         self.button_next = button.Button(self, 'Next', 1000, 125)
         self.button_prev = button.Button(self, 'Prev', 100, 125)
-        self.button_next_phase = button.Button(self, 'Finish', 1000, 650)
-        #endregion
+        self.button_next_phase = button.Button(self, 'Finish', 1000, 750)
+        self.elements = elements.Elements(self, 150, 150)
+        #endregion P_CHOOSE_DECK
         #region BATTLE
         self.is_first_round = True
         self.player_one = draw_text.Text(self.screen, "Player 1", 20, 20)
@@ -42,11 +48,11 @@ class AstralBattles():
         self.player_two_head = None
         self.mana = []
         self.field = []
-        self.player_one_space = empty_square.EmptySquare(350, 250, self.settings.count_of_cards_in_hand, self.screen)
-        self.player_two_space = empty_square.EmptySquare(350, 100, self.settings.count_of_cards_in_hand, self.screen)
-        self.player_one_played_cards = [None, None, None, None, None]
-        self.player_two_played_cards = [None, None, None, None, None]
-        self.button_next_turn = button.Button(self, "Finish", 1000, 600)
+        self.player_one_space = empty_square.EmptySquare(300, 250, self.settings.count_of_cards_in_hand, self.screen)
+        self.player_two_space = empty_square.EmptySquare(300, 100, self.settings.count_of_cards_in_hand, self.screen)
+        self.player_one_played_cards = [None, None, None, None, None, None]
+        self.player_two_played_cards = [None, None, None, None, None, None]
+        self.button_next_turn = button.Button(self, "Finish", 1000, 750)
         self.button_pressed = True
         self.player_one_head = None
         self.player_two_head = None
@@ -81,6 +87,9 @@ class AstralBattles():
 
     def run_game(self):
         while True:
+            if self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_CARDS_P1 or self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_CARDS_P2:
+                self.set_info()
+
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
@@ -104,8 +113,10 @@ class AstralBattles():
             self.screen.fill(self.settings.bg_color)
             if self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_CARDS_P1:
                 self._draw_field_choose_cards_part()
+                self.draw_info()
             if self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_CARDS_P2:
                 self._draw_field_choose_cards_part()
+                self.draw_info()
             if self.settings.part_of_the_game == Set.PartsOfGame.BATTLE:
                 self._draw_battle_part()
             if self.settings.part_of_the_game == Set.PartsOfGame.ENDING:
@@ -115,6 +126,122 @@ class AstralBattles():
             if self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_HEAD_P1 or self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_HEAD_P2:
                 self.draw_choose_head_part()
             pygame.display.flip()
+
+
+    def process_skill(self):
+        #AttackAllEnemies
+        i = 0
+        #AttackInsrRound
+        #CompletlyHealsOwnersCreatures
+        #DealDamageToMostHitPointedOpponentsCreature
+        #DealDamageToNeigboringSlots
+        #DealDamageToOpponentEveryRound
+        #DealDamageToOpposingSlot
+        #DealDamageToOwnerEveryRound
+        #DealsDamageToAllOpponentsCreaturesEachTurn
+        #ReducesRandomOwnersPowerEachTurn
+        #DealsDamageToNewcomers
+        #DealsDamageToOpponentAndHisCreaturesEqualOwnerElementPower
+        #DealsDamageToOpponentEqualsSpecialElementManaEachTurn
+        #DealsDamageToOpponentFrom1To6
+        #DealsDamageToOpponentsCreatureByTheirsCostsAtSummoning
+        #DealsDamageToOppositeSlotHalflife
+        #DealsDamageToRandomOpponentsCreature
+        #DecreaseOpponentPowersEachTurn
+        #DecreasesAllOpponentsPowersWhenKilled
+        #DestroysWeakOpponentsCreaturesEachTurnEnd
+        #DoDamageAtSummoningToAll
+        #DoDamageAtSummoningToOpponent
+        #Elemental
+        #DoDamageAtSummoningToOpponentAndHisCards
+        #EarnDeathPowerOnOpponentsCreatureDeath
+        #GiantSpiderSkill
+        #GivesRandomPowerWhenAnyCreatureDies
+        #GotDamageBonusByNeighboring
+        #MovesToEmptySlotIfOppositingSlotIsNotEmpty
+        #GriffinSkill
+        #HealEveryone
+        #HealOwnerEachTurn
+        #HealPlayerAtSummoning
+        #HealsNeighboringOnSummoning
+        #HealsOwnerEachTurnFrom1To6
+        #HealsOwnersCreaturesAtSummoning
+        #Horror
+        #IgnoredDamageLessThan
+        #IncreaseElementPowerBy1EachTurn
+        #DoDamageAtSummoningToOpponentsCards
+        #DoDamageToOpponentAtSummoning
+        #IncreaseNeighborAttackBy
+        #IncreaseOpponentsCardsCost
+        #IncreaseOpponentsCardsCostPermanently
+        #IncreaseOwnersCreaturesAttack
+        #IncreaseOwnersPowers
+        #IncreasePowerOnSummoningBy2
+        #IncreasePowerOnSummoningBy3
+        #IncreasesOpponentsSpellsCosts
+        #IncreaseSpellsDamage
+        #IncreasesPowerBy2WhenDying
+        #IncreasesRandomOwnersPowerEachTurn
+        #KillsCheapestOpponentsCardTypeWhenAttacksEmptySlot
+        #MagicImmune
+        #MaxRecievedDamageIs
+        #Mindstealer
+        #MovesToRandomSlotEachTurn
+        #StunsOppositingSlotEachTurn
+        #MustBeSummonedIntoBusySlot
+        #NeighborsAttacksOnSummoning
+        #None
+        #Phoenix
+        #ProtectsNeighboringBy
+        #ReduceDamageToOwnerByHalf
+        #ReducedOpponentsPowers
+        #ReflectsDamageToOpponent
+        #Regeneration
+        #SpellsDamageIncreaseBy50Percentage
+        #Stun
+        #StunsOppositSlotOnSummoning
+        #SummonedSoldierToRandomSlotEachTurn
+        #SummonsClonesToNeighboringSlots
+        #TakesDamageToOwnerToItselfInstead
+        #TakesToOwnerPowersOfAllKindAtSummoning
+        #Vampire
+
+
+    def set_info(self):
+        mouse_pos = pygame.mouse.get_pos()
+        for card in self.available_cards.cards:
+            if card.rect.collidepoint(mouse_pos):
+                description = self._divide_text(db_data.get_description(card.inner_name))
+                self.description = draw_text.Texts(self.screen, description,
+                    self.screen.get_width() // 2, self.screen.get_height() // 2 + 20, t_color=(0, 0, 0))
+                self.name = draw_text.New_Text(self.screen, card.inner_name, self.screen.get_width() // 2, self.screen.get_height() // 2, 
+                    t_color=(0, 0, 0))
+                self.viewing_card = Card(self.screen, card.inner_name, self.screen.get_width() // 2 - 150, self.screen.get_height() // 2)
+                return
+        self.description = None
+    
+
+    def draw_info(self):
+        if self.description:
+            self.description.blitme()
+            self.name.blitme()
+            self.viewing_card.blitme()
+
+
+    def _divide_text(self, text):
+        texts = []
+        length = len(text)
+        counter = 0
+        while length > self.settings.text_length:
+            length -= self.settings.text_length
+            counter += 1
+        i = 0
+        while counter > 0:
+            texts.append(text[i * self.settings.text_length: (i + 1) * self.settings.text_length])
+            i += 1
+            counter -= 1
+        texts.append(text[i * self.settings.text_length:])
+        return texts     
 
 
     def choose_head_part(self):
@@ -246,7 +373,7 @@ class AstralBattles():
             if self.button_next_turn.rect.collidepoint(mouse_pos) and not self.button_pressed:
                 self.button_pressed = True
                 for value in self.player_one_mana:
-                    self.player_one_mana[value] += 1
+                    self.player_one_mana[value] += self.settings.mana_increase_player_one
                 if not self.is_first_round:
                     self._player_one_cards_atack()
                 self.settings.turn = Set.Players.PLAYER_TWO
@@ -274,7 +401,7 @@ class AstralBattles():
             if self.button_next_turn.rect.collidepoint(mouse_pos) and not self.button_pressed:
                 self.button_pressed = True
                 for value in self.player_two_mana:
-                    self.player_two_mana[value] += 1
+                    self.player_two_mana[value] += self.settings.mana_increase_player_two
                 if not self.is_first_round:
                     self._player_two_cards_atack()
                 if self.is_first_round:
@@ -419,6 +546,7 @@ class AstralBattles():
     def _choose_cards_part(self):
         self._click_on_card()
         self._click_on_button()
+        self._click_on_element()
 
 
     def _draw_field_choose_cards_part(self):
@@ -431,7 +559,17 @@ class AstralBattles():
             chosen_card.blitme()
         self.button_next.draw_button()
         self.button_prev.draw_button()
-        self.button_next_phase.draw_button()  
+        self.button_next_phase.draw_button()
+        self.elements.blitme()  
+
+
+    def _click_on_element(self):
+        mouse_pos = pygame.mouse.get_pos()
+        for i in range(len(self.elements.elements_rect)):
+            if self.elements.elements_rect[i].collidepoint(mouse_pos):
+                self.current_element = self.all_elements.get_element(i + 1)
+                self.start_index_available_card = 0
+                self.end_index_available_card = 4
 
 
     def _click_on_card(self):
@@ -459,14 +597,14 @@ class AstralBattles():
     def _click_on_button(self):
         mouse_pos = pygame.mouse.get_pos()
         if self.button_next.rect.collidepoint(mouse_pos):
-            if not (self.end_index_available_card + 1) > db_data.get_count_row():
+            if not (self.end_index_available_card + 1) >= len(db_data.get_cards_of_element(self.current_element)):
                 self.end_index_available_card += 1
                 self.start_index_available_card += 1
         if self.button_prev.rect.collidepoint(mouse_pos):
-            if not self.end_index_available_card == self.settings.count_of_cards_in_hand:
+            if self.start_index_available_card > 0:
                 self.end_index_available_card -= 1
                 self.start_index_available_card -= 1
-        self.available_cards = CreateDeck(self.screen, self.start_index_available_card, self.end_index_available_card, 250, 100)
+        self.available_cards = CreateDeck(self.screen, self.start_index_available_card, self.end_index_available_card, 250, 250, self.current_element)
         if self.button_next_phase.rect.collidepoint(mouse_pos):
             if self.settings.part_of_the_game == Set.PartsOfGame.CHOOSE_CARDS_P1 and self.chosen_cards != []:
                 self.settings.part_of_the_game = Set.PartsOfGame.CHOOSE_CARDS_P2
